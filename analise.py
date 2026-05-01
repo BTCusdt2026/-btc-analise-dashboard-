@@ -1,57 +1,39 @@
 import pandas as pd
-import requests
+import yfinance as yf
 from datetime import datetime
 
-COIN_MAP = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "BNB": "binancecoin", "XRP": "ripple"}
+SYMBOL_MAP = {"BTC": "BTC-USD", "ETH": "ETH-USD", "SOL": "SOL-USD", "BNB": "BNB-USD", "XRP": "XRP-USD"}
 
 def get_data(symbol, interval):
-    """Pega candles reais da CoinGecko com /market_chart"""
-    coin_id = COIN_MAP.get(symbol, "bitcoin")
+    """Pega candles reais do Yahoo Finance"""
+    ticker = SYMBOL_MAP.get(symbol, "BTC-USD")
     
-    # Mapeia timeframe pra dias + intervalo
+    # yfinance usa: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
     interval_map = {
-        "1m": {"days": "1", "interval": "minute"},
-        "5m": {"days": "1", "interval": "minute"}, 
-        "15m": {"days": "1", "interval": "minute"},
-        "1h": {"days": "1", "interval": "hourly"},
-        "4h": {"days": "1", "interval": "hourly"},
-        "1d": {"days": "200", "interval": "daily"}
+        "1m": "1m", "5m": "5m", "15m": "15m", 
+        "1h": "1h", "4h": "1h", "1d": "1d"
     }
+    yf_interval = interval_map.get(interval, "1h")
     
-    cfg = interval_map.get(interval, {"days": "1", "interval": "hourly"})
-    
-    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-    params = {"vs_currency": "usd", "days": cfg["days"], "interval": cfg["interval"]}
+    # period = 1d pra intraday, 200d pra 1d
+    period = "1d" if yf_interval != "1d" else "200d"
     
     try:
-        r = requests.get(url, timeout=10)
-        r.raise_for_status()
-        data = r.json()
+        df = yf.download(ticker, period=period, interval=yf_interval, progress=False)
+        if df.empty:
+            raise Exception("yfinance retornou vazio")
         
-        # market_chart retorna {prices: [[ts, price]], volumes: [[ts, vol]]}
-        prices = data['prices']
-        volumes = data['volumes']
-        
-        df = pd.DataFrame(prices, columns=['timestamp', 'close'])
-        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-        df['volume'] = [v[1] for v in volumes]
-        
-        # Para OHLC simulamos open/high/low = close, já que CoinGecko não dá OHLC no intraday
-        df['open'] = df['close'].shift(1).fillna(df['close'])
-        df['high'] = df[['open', 'close']].max(axis=1)
-        df['low'] = df[['open', 'close']].min(axis=1)
-        
+        df = df.reset_index()
+        df = df.rename(columns={"Datetime": "timestamp", "Date": "timestamp", "Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"})
         return df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
     except Exception as e:
-        raise Exception(f"CoinGecko erro: {e}")
+        raise Exception(f"yfinance erro: {e}")
 
 def get_preco(symbol):
     """Preço atual em tempo real"""
-    coin_id = COIN_MAP.get(symbol, "bitcoin")
-    url = f"https://api.coingecko.com/api/v3/simple/price"
-    params = {"ids": coin_id, "vs_currencies": "usd"}
-    r = requests.get(url, timeout=5)
-    return float(r.json()[coin_id]['usd'])
+    ticker = SYMBOL_MAP.get(symbol, "BTC-USD")
+    df = yf.download(ticker, period="1d", interval="1m", progress=False)
+    return float(df['Close'].iloc[-1])
 
 def calcular_indicadores(df):
     """Calcula RSI e MACD reais"""
