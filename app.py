@@ -99,7 +99,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
         
-        # Funções auxiliares
         def safe_float(val, default=0.0):
             try:
                 return float(val.item()) if hasattr(val, 'item') else float(val)
@@ -117,22 +116,4 @@ else:
         with col1:
             st.markdown(f"""
             <div class="card" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
-                <span class="lock">🔒</span>
-                📊 <h3>Análise Técnica Avançada</h3>
-                <p>RSI: {rsi:.1f} | MACD: {'Bullish' if macd > 0 else 'Bearish'} | Tendência: {'Alta' if macd > 0 else 'Baixa'}</p>
-                <span class="badge green">+24% assertividade</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown(f"""
-            <div class="card" style="background: linear-gradient(135deg, #78350F, #451A03);">
-                <span class="lock">🔒</span>
-                ⬡ <h3>Padrões Harmônicos</h3>
-                <p>Padrão: {'AB=CD' if vol_std > 0.02 else 'Nenhum'} | Confiança: {65 if vol_std > 0.02 else 30}%</p>
-                <span class="badge green">+22% assertividade</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown(f"""
-            <div class="card" style="background: linear-gradient(135deg, #7C2D12, #450A0A);">
-                
+                <span class="
