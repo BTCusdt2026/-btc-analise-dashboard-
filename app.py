@@ -42,27 +42,14 @@ else:
         st.metric("Preço Atual", f"${preco_atual:,.2f}")
         fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
         fig.update_layout(template="plotly_dark", height=400)
-                ultimo = df.iloc[-1]
-        rsi = float(ultimo['rsi'].item()) if pd.notna(ultimo['rsi']) else 50.0
-        macd = float(ultimo['macd'].item()) if pd.notna(ultimo['macd']) else 0.0
-        score = 50
-        if rsi < 30: score += 20
-        elif rsi > 70: score -= 20
-        if macd > 0: score += 15
-        else: score -= 15
-        score = max(0, min(100, int(score)))
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            card1 = '<div class="card" style="background: linear-gradient(135deg, #1E293B, #0F172A); padding:18px; border-radius:16px; border:1px solid #30363D; margin-bottom:15px; color:white; height:180px;">'
-            card1 += '<span class="lock" style="float:right; opacity:0.4;">🔒</span>'
-            card1 += '📊 <h3 style="margin:8px 0 4px 0; font-size:16px; font-weight:600;">Análise Técnica Avançada</h3>'
-            card1 += '<p style="margin:0; font-size:12px; opacity:0.7; height:40px; overflow:hidden;">RSI: ' + f'{rsi:.1f}' + ' | MACD: ' + ('Bullish' if macd > 0 else 'Bearish') + '</p>'
-            card1 += '<span class="badge" style="display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; margin-top:8px; background:rgba(16,185,129,0.2); color:#10B981;">+24% assertividade</span>'
-            card1 += '</div>'
-            st.markdown(card1, unsafe_allow_html=True)
-        st.success("Dados carregados. Cards simplificados para evitar erro de sintaxe.")
+    st.metric("Preço Atual", f"${preco_atual:,.2f}")
+    fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
+    fig.update_layout(template="plotly_dark", height=400)
+    st.plotly_chart(fig, use_container_width=True)
+    
+    ultimo = df.iloc[-1]
+    rsi = float(ultimo['rsi'].item()) if pd.notna(ultimo['rsi']) else 50.0
+    macd = float(ultimo['macd'].item()) if pd.notna(ultimo['macd']) else 0.0
         
     except Exception as e:
         st.error(f"Erro: {e}")
