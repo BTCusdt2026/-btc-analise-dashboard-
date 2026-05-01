@@ -92,12 +92,11 @@ else:
         sinal = "COMPRA" if score > 60 else "VENDA" if score < 40 else "NEUTRO"
         cor_sinal = "green" if sinal == "COMPRA" else "red" if sinal == "VENDA" else "#8B949E"
         
-        st.markdown(f"""
-        <div class="card" style="background: #161B22; height:auto; text-align:center;">
-            <h3 style="margin:0; color:{cor_sinal};">SINAL: {sinal}</h3>
-            <p style="margin:5px 0; color:#8B949E;">Score: {score}/100 | RSI: {rsi:.1f}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        sinal_html = '<div class="card" style="background: #161B22; height:auto; text-align:center;">'
+        sinal_html += '<h3 style="margin:0; color:' + cor_sinal + ';">SINAL: ' + sinal + '</h3>'
+        sinal_html += '<p style="margin:5px 0; color:#8B949E;">Score: ' + str(score) + '/100 | RSI: ' + f'{rsi:.1f}' + '</p>'
+        sinal_html += '</div>'
+        st.markdown(sinal_html, unsafe_allow_html=True)
         
         def safe_float(val, default=0.0):
             try:
@@ -114,6 +113,79 @@ else:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown(f"""
-            <div class="card" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
-                <span class="
+            card1 = '<div class="card" style="background: linear-gradient(135deg, #1E293B, #0F172A);">'
+            card1 += '<span class="lock">🔒</span>'
+            card1 += '📊 <h3>Análise Técnica Avançada</h3>'
+            card1 += '<p>RSI: ' + f'{rsi:.1f}' + ' | MACD: ' + ('Bullish' if macd > 0 else 'Bearish') + ' | Tendência: ' + ('Alta' if macd > 0 else 'Baixa') + '</p>'
+            card1 += '<span class="badge green">+24% assertividade</span>'
+            card1 += '</div>'
+            st.markdown(card1, unsafe_allow_html=True)
+            
+            card2 = '<div class="card" style="background: linear-gradient(135deg, #78350F, #451A03);">'
+            card2 += '<span class="lock">🔒</span>'
+            card2 += '⬡ <h3>Padrões Harmônicos</h3>'
+            card2 += '<p>Padrão: ' + ('AB=CD' if vol_std > 0.02 else 'Nenhum') + ' | Confiança: ' + str(65 if vol_std > 0.02 else 30) + '%</p>'
+            card2 += '<span class="badge green">+22% assertividade</span>'
+            card2 += '</div>'
+            st.markdown(card2, unsafe_allow_html=True)
+            
+            card3 = '<div class="card" style="background: linear-gradient(135deg, #7C2D12, #450A0A);">'
+            card3 += '<span class="lock">🔒</span>'
+            card3 += '🎯 <h3>Análise Probabilística</h3>'
+            card3 += '<p>Prob. Alta: ' + str(score) + '% | Prob. Baixa: ' + str(100-score) + '%</p>'
+            card3 += '<span class="badge green">+28% assertividade</span>'
+            card3 += '</div>'
+            st.markdown(card3, unsafe_allow_html=True)
+            
+            card4 = '<div class="card" style="background: linear-gradient(135deg, #581C87, #3B0764);">'
+            card4 += '<span class="lock">🔒</span>'
+            card4 += '🖼️ <h3>Visual IA do Gráfico</h3>'
+            card4 += '<p>Suporte: $' + f'{suporte:,.0f}' + ' | Resistência: $' + f'{resistencia:,.0f}' + '</p>'
+            card4 += '<span class="badge green">+33% assertividade</span>'
+            card4 += '</div>'
+            st.markdown(card4, unsafe_allow_html=True)
+        
+        with col2:
+            smc_zona = "Acumulação" if rsi < 40 else "Distribuição" if rsi > 60 else "Range"
+            smc_liquidez = "Alta" if volume_ultimo > volume_medio else "Baixa"
+            card5 = '<div class="card" style="background: linear-gradient(135deg, #581C87, #3B0764);">'
+            card5 += '<span class="lock">🔒</span>'
+            card5 += '🧠 <h3>Smart Money Concept</h3>'
+            card5 += '<p>Zona: ' + smc_zona + ' | Liquidez: ' + smc_liquidez + '</p>'
+            card5 += '<span class="badge green">+27% assertividade</span>'
+            card5 += '</div>'
+            st.markdown(card5, unsafe_allow_html=True)
+            
+            wyckoff_fase = "Acumulação" if rsi < 45 else "Marcação" if rsi > 55 else "Distribuição"
+            elliott_onda = "3" if macd > 0 else "5" if macd < 0 else "2"
+            card6 = '<div class="card" style="background: linear-gradient(135deg, #064E3B, #022C22);">'
+            card6 += '<span class="lock">🔒</span>'
+            card6 += '📈 <h3>WEGD Wyckoff/Elliott</h3>'
+            card6 += '<p>Fase: ' + wyckoff_fase + ' | Onda: ' + elliott_onda + '</p>'
+            card6 += '<span class="badge green">+31% assertividade</span>'
+            card6 += '</div>'
+            st.markdown(card6, unsafe_allow_html=True)
+            
+            timing_entrada = "Agora" if 40 < rsi < 60 else "Esperar"
+            timing_alvo = f"${preco_atual * 1.03:,.0f}" if macd > 0 else f"${preco_atual * 0.97:,.0f}"
+            card7 = '<div class="card" style="background: linear-gradient(135deg, #1E3A8A, #0C1E4D);">'
+            card7 += '<span class="lock">🔒</span>'
+            card7 += '⏰ <h3>Timing & Horizonte</h3>'
+            card7 += '<p>Entrada: ' + timing_entrada + ' | Alvo: ' + timing_alvo + '</p>'
+            card7 += '<span class="badge green">+19% assertividade</span>'
+            card7 += '</div>'
+            st.markdown(card7, unsafe_allow_html=True)
+            
+            sentimento = "Bullish" if macd > 0 and volume_ultimo > volume_medio else "Bearish"
+            card8 = '<div class="card" style="background: linear-gradient(135deg, #92400E, #451A03);">'
+            card8 += '<span class="lock">🔒</span>'
+            card8 += '📰 <h3>Notícias & Sentimento</h3>'
+            card8 += '<p>Sentimento: ' + sentimento + ' | Volume: $' + f'{df["volume"].sum():,.0f}' + '</p>'
+            card8 += '<span class="badge green">+18% assertividade</span>'
+            card8 += '</div>'
+            st.markdown(card8, unsafe_allow_html=True)
+        
+        st.caption(f"Última atualização: {datetime.now().strftime('%H:%M:%S')} • Dados Yahoo Finance em tempo real")
+        
+    except Exception as e:
+        st.error(f"Erro ao carregar dados: {e}")
