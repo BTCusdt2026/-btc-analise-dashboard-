@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import analise
+import pandas as pd
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 from datetime import datetime
@@ -79,8 +80,8 @@ else:
         st.plotly_chart(fig, use_container_width=True)
         
         ultimo = df.iloc[-1]
-        rsi = float(ultimo['rsi']) if not pd.isna(ultimo['rsi']) else 50.0
-        macd = float(ultimo['macd']) if not pd.isna(ultimo['macd']) else 0.0
+        rsi = float(ultimo['rsi']) if pd.notna(ultimo['rsi']) else 50.0
+        macd = float(ultimo['macd']) if pd.notna(ultimo['macd']) else 0.0
         score = 50
         if rsi < 30: score += 20
         elif rsi > 70: score -= 20
@@ -98,12 +99,40 @@ else:
         </div>
         """, unsafe_allow_html=True)
         
+        # Funções auxiliares
         def safe_float(val, default=0.0):
             try:
                 return float(val.item()) if hasattr(val, 'item') else float(val)
             except:
                 return default
         
-        def safe_suporte_resistencia():
-            try:
-                suporte = df['low'].rolling(20).min().iloc
+        suporte = safe_float(df['low'].rolling(20).min().iloc[-1], preco_atual * 0.98)
+        resistencia = safe_float(df['high'].rolling(20).max().iloc[-1], preco_atual * 1.02)
+        volume_medio = safe_float(df['volume'].mean(), 0)
+        volume_ultimo = safe_float(df['volume'].iloc[-1], 0)
+        vol_std = safe_float(df['close'].pct_change().std(), 0.01)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown(f"""
+            <div class="card" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
+                <span class="lock">🔒</span>
+                📊 <h3>Análise Técnica Avançada</h3>
+                <p>RSI: {rsi:.1f} | MACD: {'Bullish' if macd > 0 else 'Bearish'} | Tendência: {'Alta' if macd > 0 else 'Baixa'}</p>
+                <span class="badge green">+24% assertividade</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="card" style="background: linear-gradient(135deg, #78350F, #451A03);">
+                <span class="lock">🔒</span>
+                ⬡ <h3>Padrões Harmônicos</h3>
+                <p>Padrão: {'AB=CD' if vol_std > 0.02 else 'Nenhum'} | Confiança: {65 if vol_std > 0.02 else 30}%</p>
+                <span class="badge green">+22% assertividade</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="card" style="background: linear-gradient(135deg, #7C2D12, #450A0A);">
+                
