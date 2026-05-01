@@ -32,24 +32,4 @@ def login():
         usuario_correto = os.environ.get("USER", "admin")
         senha_correta = os.environ.get("PASS", "123456")
 
-        if st.button("Entrar"):
-            if usuario == usuario_correto and senha == senha_correta:
-                st.success("Login realizado com sucesso!")
-                st.session_state["logado"] = True
-                st.rerun()
-            else:
-                st.error("Usuário ou senha incorretos")
-
-if "logado" not in st.session_state:
-    st.session_state["logado"] = False
-
-if not st.session_state["logado"]:
-    login()
-else:
-    # DASHBOARD
-    st.title("BTC Análise Dashboard")
-    st.write("Bem-vindo! Login funcionando.")
-    
-    # Aqui você coloca o resto do seu código do dashboard
-    # score = analise.calcular_score()
-    # st.metric("Score", score)
+        if st.button("Entr
