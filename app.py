@@ -4,11 +4,9 @@ import analise
 import pandas as pd
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
-from datetime import datetime
 
 st.set_page_config(page_title="BTC Análise PRO", layout="wide")
 st_autorefresh(interval=15000, key="datarefresh")
-
 st.markdown("<style>.main{background-color:#0E1117;}</style>", unsafe_allow_html=True)
 
 def login():
@@ -42,14 +40,7 @@ else:
         st.metric("Preço Atual", f"${preco_atual:,.2f}")
         fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
         fig.update_layout(template="plotly_dark", height=400)
-    st.metric("Preço Atual", f"${preco_atual:,.2f}")
-    fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
-    fig.update_layout(template="plotly_dark", height=400)
-    st.plotly_chart(fig, use_container_width=True)
-    
-    ultimo = df.iloc[-1]
-    rsi = float(ultimo['rsi'].item()) if pd.notna(ultimo['rsi']) else 50.0
-    macd = float(ultimo['macd'].item()) if pd.notna(ultimo['macd']) else 0.0
+        st.plotly_chart(fig, use_container_width=True)
         
     except Exception as e:
         st.error(f"Erro: {e}")
