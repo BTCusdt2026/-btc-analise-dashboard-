@@ -35,4 +35,16 @@ else:
     try:
         df = analise.get_data(ativo, timeframe)
         df = analise.calcular_indicadores(df)
-        preco_atual = analise.get
+        preco_atual = analise.get_preco(ativo)
+        
+        st.metric("Preço Atual", f"${preco_atual:,.2f}")
+        fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
+        fig.update_layout(template="plotly_dark", height=400)
+        st.plotly_chart(fig, use_container_width=True)
+        
+        ultimo = df.iloc[-1]
+        rsi = float(ultimo['rsi'].item()) if pd.notna(ultimo['rsi']) else 50.0
+        macd = float(ultimo['macd'].item()) if pd.notna(ultimo['macd']) else 0.0
+        
+    except Exception as e:
+        st.error(f"Erro: {e}")
