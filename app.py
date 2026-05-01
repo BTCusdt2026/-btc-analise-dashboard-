@@ -1,7 +1,7 @@
 import streamlit as st
+import os
 import pandas as pd
 import analise
-
 st.set_page_config(page_title="BTC Análise PRO", layout="wide", page_icon="📊")
 
 # CSS Dark PRO
@@ -30,11 +30,11 @@ def login():
         with st.container():
             st.markdown('<div class="card">', unsafe_allow_html=True)
             usuario = st.text_input("Usuário")
-            senha = st.text_input("Senha", type="password")
-            if st.button("Entrar", use_container_width=True):
-                if usuario == st.secrets["USER"] and senha == st.secrets["PASS"]:
-                    st.session_state["logado"] = True
-                    st.rerun()
+            usuario_correto = os.environ.get("USER", "admin")
+senha_correta = os.environ.get("PASS", "123456")
+
+if usuario == usuario_correto and senha == senha_correta:
+    st.success("Login realizado com sucesso!")
                 else:
                     st.error("Usuário ou senha incorretos")
             st.markdown('</div>', unsafe_allow_html=True)
