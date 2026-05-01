@@ -35,12 +35,4 @@ else:
     try:
         df = analise.get_data(ativo, timeframe)
         df = analise.calcular_indicadores(df)
-        preco_atual = analise.get_preco(ativo)
-        
-        st.metric("Preço Atual", f"${preco_atual:,.2f}")
-        fig = go.Figure(data=[go.Candlestick(x=df['timestamp'], open=df['open'], high=df['high'], low=df['low'], close=df['close'])])
-        fig.update_layout(template="plotly_dark", height=400)
-        st.plotly_chart(fig, use_container_width=True)
-        
-    except Exception as e:
-        st.error(f"Erro: {e}")
+        preco_atual = analise.get
