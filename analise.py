@@ -2,38 +2,52 @@ import pandas as pd
 import requests
 from datetime import datetime
 
+COIN_MAP = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "BNB": "binancecoin", "XRP": "ripple"}
+
 def get_data(symbol, interval):
-    """Pega candles reais da CoinGecko"""
-    coin_map = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "BNB": "binancecoin", "XRP": "ripple"}
-    coin_id = coin_map.get(symbol, "bitcoin")
+    """Pega candles reais da CoinGecko com /market_chart"""
+    coin_id = COIN_MAP.get(symbol, "bitcoin")
     
-    # CoinGecko usa dias. 1m=1, 5m=1, 15m=1, 1h=1, 4h=1, 1d=200
-    days = "1" if interval != "1d" else "200"
+    # Mapeia timeframe pra dias + intervalo
+    interval_map = {
+        "1m": {"days": "1", "interval": "minute"},
+        "5m": {"days": "1", "interval": "minute"}, 
+        "15m": {"days": "1", "interval": "minute"},
+        "1h": {"days": "1", "interval": "hourly"},
+        "4h": {"days": "1", "interval": "hourly"},
+        "1d": {"days": "200", "interval": "daily"}
+    }
     
-    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/ohlc"
-    params = {"vs_currency": "usd", "days": days}
+    cfg = interval_map.get(interval, {"days": "1", "interval": "hourly"})
+    
+    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
+    params = {"vs_currency": "usd", "days": cfg["days"], "interval": cfg["interval"]}
     
     try:
         r = requests.get(url, timeout=10)
         r.raise_for_status()
         data = r.json()
         
-        # CoinGecko retorna [timestamp, open, high, low, close]
-        df = pd.DataFrame(data, columns=['timestamp','open','high','low','close'])
-        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-        df[['open','high','low','close']] = df[['open','high','low','close']].astype(float)
+        # market_chart retorna {prices: [[ts, price]], volumes: [[ts, vol]]}
+        prices = data['prices']
+        volumes = data['volumes']
         
-        # Se for timeframe menor que 1d, CoinGecko só tem 1 dia. Então simula volume
-        df['volume'] = df['close'] * 1000  
-        return df
+        df = pd.DataFrame(prices, columns=['timestamp', 'close'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+        df['volume'] = [v[1] for v in volumes]
+        
+        # Para OHLC simulamos open/high/low = close, já que CoinGecko não dá OHLC no intraday
+        df['open'] = df['close'].shift(1).fillna(df['close'])
+        df['high'] = df[['open', 'close']].max(axis=1)
+        df['low'] = df[['open', 'close']].min(axis=1)
+        
+        return df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
     except Exception as e:
         raise Exception(f"CoinGecko erro: {e}")
 
 def get_preco(symbol):
-    """Pega preço atual em tempo real da CoinGecko"""
-    coin_map = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "BNB": "binancecoin", "XRP": "ripple"}
-    coin_id = coin_map.get(symbol, "bitcoin")
-    
+    """Preço atual em tempo real"""
+    coin_id = COIN_MAP.get(symbol, "bitcoin")
     url = f"https://api.coingecko.com/api/v3/simple/price"
     params = {"ids": coin_id, "vs_currencies": "usd"}
     r = requests.get(url, timeout=5)
