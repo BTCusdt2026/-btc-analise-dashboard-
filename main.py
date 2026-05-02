@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 import requests
 
 app = FastAPI(title="Radar Institucional BTC")
+templates = Jinja2Templates(directory="templates")
 
 BASE_URL = "https://fapi.binance.com"
 HEADERS = {"User-Agent": "Mozilla/5.0"}
@@ -38,8 +41,8 @@ def institutional_signal(symbol="BTCUSDT"):
             bias = "⏳ AGUARDANDO FLUXO"
             
         return {
-            "price": price,
-            "oi_delta": oi_delta,
+            "price": round(price, 2),
+            "oi_delta": round(oi_delta, 2),
             "institutional_signal": signal,
             "market_bias": bias
         }
@@ -51,9 +54,10 @@ def institutional_signal(symbol="BTCUSDT"):
             "market_bias": f"Erro: {str(e)}"
         }
 
-@app.get("/")
-def home():
-    return {"status": "Radar Institucional Online", "endpoint": "/radar"}
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    data = institutional_signal()
+    return templates.TemplateResponse("index.html", {"request": request, "data": data})
 
 @app.get("/radar")
 def radar():
