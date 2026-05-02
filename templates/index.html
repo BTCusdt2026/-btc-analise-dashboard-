@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Radar Institucional BTC</title>
+    <title>BTC Dashboard</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: Arial, sans-serif; background: #0d1117; color: #fff; text-align: center; padding: 40px; }
-        table { margin: auto; border-collapse: collapse; width: 80%; max-width: 600px; }
-        th, td { padding: 12px; border: 1px solid #30363d; }
-        th { background: #161b22; }
-        .green { color: #3fb950; }
-        .red { color: #f85149; }
-    </style>
-</head>
-<body>
-    <h1>📊 Radar Institucional BTC</h1>
-    <table>
-        <tr><th>Preço BTC</th><td>${{ data.price }}</td></tr>
-        <tr><th>Delta OI 5m</th><td class="{{ 'green' if data.oi_delta > 0 else 'red' if data.oi_delta < 0 else '' }}">{{ data.oi_delta }}</td></tr>
-        <tr><th>Sinal Institucional</th><td>{{ data.institutional_signal }}</td></tr>
-        <tr><th>Viés de Mercado</th><td>{{ data.market_bias }}</td></tr>
-    </table>
-</body>
-</html>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #0d1117; 
+            color: #fff; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .card { 
+            background: #161b22; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid #30363d;
+        }
+        h1 { color: #f7931a; margin-bottom: 10px; }
+        h2 { color: #
