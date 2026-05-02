@@ -20,7 +20,8 @@ def get_open_interest(symbol="BTCUSDT"):
     try:
         r = requests.get(f"{BASE_URL}/futures/data/openInterestHist", params={"symbol": symbol, "period": "5m", "limit": 2}, headers=HEADERS, timeout=5)
         data = r.json()
-        if len(data) < 2: return 0
+        if len(data) < 2: 
+            return 0
         return float(data[-1]["sumOpenInterest"]) - float(data[-2]["sumOpenInterest"])
     except:
         return 0
