@@ -58,7 +58,7 @@ def institutional_signal(symbol="BTCUSDT"):
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     data = institutional_signal()
-    return templates.TemplateResponse("index.html", {"request": request, "data": data})
+    templates.TemplateResponse("index.html", {"request": request, "data": data})
 
 @app.get("/radar")
 def radar():
